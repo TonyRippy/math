@@ -5,6 +5,26 @@ import (
 	"testing"
 )
 
+func TestCombinations(t *testing.T) {
+	cases := [][]uint{
+		[]uint{10, 0, 1},
+		[]uint{10, 10, 1},
+		[]uint{10, 1, 10},
+		[]uint{10, 9, 10},
+		[]uint{10, 3, 120},
+		[]uint{10, 5, 252},
+		[]uint{40, 10, 847660528},
+		[]uint{90, 10, 5720645481903},
+	}
+	for _, c := range(cases) {
+		expected := c[2]
+		actual := Combinations(c[0], c[1])
+		if actual != expected {
+			t.Errorf("Combinations(%d, %d): Expected %d, got %d", c[0], c[1], expected, actual)
+		}
+	}
+}
+
 /*
 A function that treats a boolean vector as a binary number,
 converting it to an integer value.
@@ -42,17 +62,17 @@ func TestPermToInt(t *testing.T) {
 func TestChooseZero(t *testing.T) {
 	// What happens if you choose zero elements?
 	calls := 0
-	GenerateCombinations(0, 0, func(perm []bool) {
+	WalkCombinations(0, 0, func(perm []bool) {
 		calls += 1
 		if len(perm) != 0 {
 			t.Errorf("Expected empty permutation, got %v", perm)
 		}
 	})
 	if calls != 1 {
-		t.Errorf("Expected 1 callback from Choose(0,0), got %d", calls)
+		t.Errorf("WalkCombinations(0, 0): expected 1 callback, got %d", calls)
 	}
 	calls = 0
-	GenerateCombinations(100, 0, func(perm []bool) {
+	WalkCombinations(100, 0, func(perm []bool) {
 		calls += 1
 		if len(perm) != 100 {
 			t.Errorf("Expected len(perm) == 100, got %d", len(perm))
@@ -64,13 +84,13 @@ func TestChooseZero(t *testing.T) {
 		}
 	})
 	if calls != 1 {
-		t.Errorf("Expected 1 callback from Choose(0,100), got %d", calls)
+		t.Errorf("WalkCombinations(100, 0): expected 1 callback, got %d", calls)
 	}	
 }
 
 func TestChooseOne(t *testing.T) {
 	calls := make([]int, 0, 10)
-	GenerateCombinations(10, 1, func(perm []bool) {
+	WalkCombinations(10, 1, func(perm []bool) {
 		calls = append(calls, permToInt(perm))
 	})
 	expected := []int{
@@ -86,12 +106,12 @@ func TestChooseOne(t *testing.T) {
 		1<<9,
 	}
 	if len(calls) != len(expected) {
-		t.Errorf("Expected %v, got %v.", expected, calls)
+		t.Errorf("WalkCombinations(10, 1): expected %v, got %v.", expected, calls)
 	}	else {	
 		sort.Sort(sort.IntSlice(calls))
 		for i, v := range(calls) {
 			if v != expected[i] {
-				t.Errorf("Call %d: expected %v, got %v.", i, expected[i], v)
+				t.Errorf("WalkCombinations(10, 1), call %d: expected %v, got %v.", i, expected[i], v)
 			}
 		}
 	}	
@@ -99,7 +119,7 @@ func TestChooseOne(t *testing.T) {
 
 func TestChooseAll(t *testing.T) {
 	calls := make([]int, 0, 10)
-	GenerateCombinations(10, 10, func(perm []bool) {
+	WalkCombinations(10, 10, func(perm []bool) {
 		calls = append(calls, permToInt(perm))
 	})
 	expected := []int{
@@ -110,20 +130,19 @@ func TestChooseAll(t *testing.T) {
 	}	else {	
 		for i, v := range(calls) {
 			if v != expected[i] {
-				t.Errorf("Call %d: expected %v, got %v.", i, expected[i], v)
+				t.Errorf("WalkCombinations(10, 10), call %d: expected %v, got %v.", i, expected[i], v)
 			}
 		}
 	}	
 }
 
 func TestChooseSome(t *testing.T) {
-	calls := 0
-	GenerateCombinations(10, 4, func(perm []bool) {
+	var calls uint = 0
+	WalkCombinations(10, 4, func(perm []bool) {
 		calls += 1
 	})
-	// 10 choose 4 = (10! / (4! * 6!))
-	expected := 210
+	expected := Combinations(10, 4)
 	if calls != expected {
-		t.Errorf("Expected %v callbacks, got %v.", expected, calls)
+		t.Errorf("WalkCombinations(10, 4): expected %v callbacks, got %v.", expected, calls)
 	}
 }

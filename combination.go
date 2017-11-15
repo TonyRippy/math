@@ -5,6 +5,46 @@ import (
 )
 
 /*
+Calculates the number of ways that k items can be chosen from a list of n items.
+A.k.a. "N choose K".
+Given by the formula: n! / (k! * (n-k)!)
+Attempts to be clever about the calculation to minimize the risk of overflow.
+*/
+func Combinations(n uint, k uint) uint {
+	if k > n {
+		return 0
+	}
+	j := n - k
+	if j > k {
+		k, j = j, k
+	}
+	if k == n {
+		return 1
+	}
+	result := n
+	var hi uint = n - 1
+	if hi > k {
+		result *= hi
+		hi -= 1
+		if hi > k {
+			result *= hi
+			hi -= 1
+		}
+	}
+	var lo uint = 2
+	for ; (lo <= j) && (result % lo == 0); lo++ {
+			result /= lo
+	}
+	for ; hi > k; hi-- {
+		result *= hi
+	}
+	for ; lo <= j; lo++ {
+		result /= lo
+	}
+	return result
+}
+
+/*
 Generates k-combinations of a collection of n items.
 
 Enumerates all the ways that k items can be chosen from a list of n items.
@@ -18,7 +58,7 @@ in undefined behavior.
 This method does not depend on recursion and uses O(n) memory, so is suitable
 for enumerating potentially large numbers of combinations.
 */
-func GenerateCombinations(n int, k int, f func([]bool)) error {
+func WalkCombinations(n int, k int, f func([]bool)) error {
 	if n < 0 {
 		return fmt.Errorf("Cannot choose from a negative number of items. (%d)", n)
 	}	
