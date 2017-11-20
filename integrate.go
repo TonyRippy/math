@@ -1,6 +1,6 @@
 /*
 Methods for performing numerical integration, based on the methods described in:
-Numerical Recipies in C, Second Edition, by Press, Teukolsky, Vetterling, Flannery.
+Numerical Recipes in C, Second Edition, by Press, Teukolsky, Vetterling, Flannery.
 
 Some modifications to the original:
   - Switched from 1-based arrays to 0-based arrays.
@@ -12,7 +12,6 @@ package math
 
 import (
 	"errors"
-	"fmt"
 	"math"
 )
 
@@ -57,7 +56,7 @@ func MidPoint(f func(float64) float64, a float64, b float64) RombergStepper {
 /*
 This routine is an exact replacement for MidPoint, i.e., returns the
 nth stage of refinement of the integral of f from a to b, except that
-the function is evaluated at evently spaced points in 1/x rather than
+the function is evaluated at evenly spaced points in 1/x rather than
 in x.  This allows the upper limit b to be as large and positive as
 the computer allows, or the lower limit a to be as large and
 negative, but not both. a and b must have the same sign.
@@ -197,10 +196,10 @@ type rungeKuttaStepper func([]float64, []float64, int, float64, float64, float64
 
 /*
 Fifth-order Runge-Kutta step with monitoring of local truncation error to ensure
-accuracy and adjust stepsize.  Inputs are the dependent variable vector y[] and
+accuracy and adjust step size.  Inputs are the dependent variable vector y[] and
 its derivative dydx[] at the starting value of the independent variable x.  Also
-input are the stepsize to be attempted h, the required accuracy eps, and the
-vector yscal[] against which the errpr os scaled.  On output, the y vector is
+input are the step size to be attempted h, the required accuracy eps, and the
+vector yscal[] against which the error is scaled.  On output, the y vector is
 replaced by their new values, and the function returns new values for x and h
 respectively.
 */  
@@ -226,7 +225,7 @@ func rkqs(y []float64, dydx []float64, n int, x float64, h float64, eps float64,
 		if errmax <= 1.0 {
 			break  // Step succeeded. 
 		}
-		// Truncation error too large, reduce stepsize.
+		// Truncation error too large, reduce step size.
 		htemp := SAFETY * h * math.Pow(errmax,PSHRINK)
 		if h >= 0.0 {
 			h = math.Max(htemp, 0.1*h)
@@ -236,7 +235,6 @@ func rkqs(y []float64, dydx []float64, n int, x float64, h float64, eps float64,
 		// No more than a factor of 10.
 		xnew := x + h
 		if xnew == x {
-			fmt.Printf("xnew=%f, h=%f, underflow\n",xnew, h)
 			return xnew, h, errors.New("step size underflow in rkqs")
 		}
 	}
@@ -253,7 +251,6 @@ func rkqs(y []float64, dydx []float64, n int, x float64, h float64, eps float64,
 	for i:= 0; i < n; i++ {
 		y[i] = ytemp[i]
 	}
-	fmt.Printf("xnew=%f, h=%f, success\n",xnext, hnext)
 	return xnext, hnext, nil
 }
 
@@ -265,16 +262,15 @@ func sign(a float64, b float64) float64 {
 }
 
 /*
-A Runge-Kutta driver with adaptive stepsize control. Integrate starting values
+A Runge-Kutta driver with adaptive step size control. Integrate starting values
 ystart[] from x1 to x2 with accuracy eps, storing intermediate results in global
-variables. (???) h1 should be set as a guessed first stepsize, hmin as the
-minimum allowed stepsize (can be zero).  On output, nok and nbad are the number
-of good and bad (but retried and fixed) steps taken, and ystart is replaced by
+variables. (???) h1 should be set as a guessed first step size, hmin as the
+minimum allowed step size (can be zero).  On output ystart[] is replaced by
 values at the end of the integration interval.  derivs is the user-supplied
 routine for calculating the right-hand side derivative, while step is the
 stepper routine to be used.
 */
-func odeint(ystart []float64, nvar int, x1 float64, x2 float64, eps float64, h1 float64, hmin float64, derivs OdeFunc, step rungeKuttaStepper) error {
+func odeint(ystart []float64, nvar int, x1 float64, x2 float64, eps float64, h1 float64, hmin float64, derivs OdeFunc, stepper rungeKuttaStepper) error {
 	const (
 		MAXSTP int = 10000  // TODO: Make this a flag? 
 		TINY float64 = 1.0e-30
@@ -288,25 +284,21 @@ func odeint(ystart []float64, nvar int, x1 float64, x2 float64, eps float64, h1 
 		y[i] = ystart[i]
 	}
 	for nstp:=0; nstp < MAXSTP; nstp++ {  // Take at most MAXSTP steps.
-		fmt.Printf("%d: x=%f, y=%v, dydx=%v\n", nstp, x, y, dydx)
 		derivs(x, y, dydx)
-		fmt.Printf("%d: x=%f, y=%v, dydx=%v\n", nstp, x, y, dydx)
 		for i:=0; i<nvar; i++ {
 			// Scaling used to monitor accuracy. This general-purpose choice can be
 			// modified if need be.
 			yscal[i] = math.Abs(y[i]) + math.Abs(dydx[i]*h) + TINY
 		}
 		if (x+h-x2)*(x+h-x1) > 0.0 {
-			// If stepsize can overshoot, decrease.
+			// If step size can overshoot, decrease.
 			h = x2 - x
 		}
-		fmt.Printf("x=%f, h=%f\n", x, h)
 		var err error
-		x, h, err = step(y, dydx, nvar, x, h, eps, yscal, derivs)
+		x, h, err = stepper(y, dydx, nvar, x, h, eps, yscal, derivs)
 		if err != nil {
 			return err
 		}
-		fmt.Printf("x=%f, h=%f\n", x, h)
 		if (x-x2)*(x2-x1) >= 0.0 {  // Are we done?
 			for i:=0; i<nvar; i++ {
 				ystart[i] = y[i]
@@ -321,7 +313,7 @@ func odeint(ystart []float64, nvar int, x1 float64, x2 float64, eps float64, h1 
 }
 
 /*
-A Runge-Kutta driver with adaptive stepsize control.
+A Runge-Kutta driver with adaptive step size control.
 
 Integrates the set of ordinary differential equations specified by ode from x1
 to x2, advancing the solution in steps, using starting values y[] known at x1.
