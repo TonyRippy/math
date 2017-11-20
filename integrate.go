@@ -1,5 +1,5 @@
 /*
-Methods for performing numerical integration, ported from the original implementation from:
+Methods for performing numerical integration, based on the methods described in:
 Numerical Recipies in C, Second Edition, by Press, Teukolsky, Vetterling, Flannery.
 
 Some modifications to the original:
