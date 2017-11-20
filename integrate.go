@@ -254,13 +254,6 @@ func rkqs(y []float64, dydx []float64, n int, x float64, h float64, eps float64,
 	return xnext, hnext, nil
 }
 
-func sign(a float64, b float64) float64 {
-	if math.Signbit(a) != math.Signbit(b) {
-		return -a
-	}
-	return a
-}
-
 /*
 A Runge-Kutta driver with adaptive step size control. Integrate starting values
 ystart[] from x1 to x2 with accuracy eps, storing intermediate results in global
@@ -279,7 +272,7 @@ func odeint(ystart []float64, nvar int, x1 float64, x2 float64, eps float64, h1 
 	y := make([]float64, nvar)
 	dydx := make([]float64, nvar)
 	x := x1
-	h := sign(h1, x2-x1)
+	h := math.Copysign(h1, x2-x1)
 	for i:=0; i<nvar; i++ {
 		y[i] = ystart[i]
 	}
