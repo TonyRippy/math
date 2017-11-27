@@ -79,20 +79,22 @@ and that its error series contains only even powers of the number of steps.  The
 routines MidPoint and MidPointInf are possible choices.
 (Also midsql, midsqu and midexp, which are not implemented here.)
 */
-func Romberg(stepper RombergStepper, eps float64) (float64, error) {
+func Romberg(stepper RombergStepper, eps float64) (ss float64, err error) {
 	const (
 		JMAX=14
 		JMAXP=JMAX+1
 		K=5
 	)
+	ss = 0.0
 	h := make([]float64, JMAXP+1)
-	s := make([]float64, JMAXP)
 	h[1] = 1.0
+	s := make([]float64, JMAXP)
 	for j:=1; j<=JMAX; j++ {
 		s[j] = stepper(j, s[j-1])
 		if j >= K {
 			i := j-K+1
-			ss, dss, err := polint(h[i:], s[i:], K, 0.0)
+			var dss float64
+			ss, dss, err = polint(h[i:], s[i:], K, 0.0)
 			if err != nil {
 				return ss, err
 			}
@@ -103,7 +105,7 @@ func Romberg(stepper RombergStepper, eps float64) (float64, error) {
 		// This is where the assumption of step tripling and even error series is used.
 		h[j+1] = h[j]/9.0
 	}
-	return 0.0, errors.New("Too many steps in Romberg")
+	return ss, errors.New("Too many steps in Romberg")
 }
 
 /*
