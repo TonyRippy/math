@@ -7,12 +7,12 @@ import (
 
 func mostlyEqual(expected, actual float64) bool {
 	const epsilon float64 = 1e-10
-	return math.Abs(expected-actual) > epsilon
+	return math.Abs(expected-actual) < epsilon
 }
 
 func testF(f func (float64, float64) float64, x float64, y float64, expected float64, t *testing.T) {
 	actual := f(x,y)
-	if mostlyEqual(expected, actual) {
+	if !mostlyEqual(expected, actual) {
 		t.Errorf("f(%f, %f) = %f, expected %f", x, y, actual, expected)
 	}
 }
