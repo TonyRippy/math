@@ -56,8 +56,8 @@ func SolveCubic(x1, y1, dy1, x2, y2, dy2 float64) (A, B, C, D float64) {
 
 	A = (e1 - f * e2) / (a1 - f * a2)
 	B = (e1 - A * a1) / b1
-	C = dy1 - (3 * A * x1 * x1) - (2 * B * x1)
-	D = y1 - (A * x1 * x1 * x1) - (B * x1 * x1) - (C * x1)
+	C = dy1 - (3 * A * xx1) - (2 * B * x1)
+	D = y1 - (A * xx1 * x1) - (B * xx1) - (C * x1)
 	return
 }
 
