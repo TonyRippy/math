@@ -74,7 +74,7 @@ func cubic4(x1, y1, dy1, x2, y2, dy2 float64) func(float64) float64 {
 	A, B, C, D := SolveCubic(x1, y1, dy1, x2, y2, dy2)
 	return func(x float64) float64 {
 		xx := x * x
-		return A*xx*x + B*xx + C*x + D
+		return xx*(A*x+B) + C*x + D
 	}
 }
 
