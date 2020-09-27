@@ -7,8 +7,8 @@ import (
 // TestCubic4vs6 tests the cubic code by comparing the output of two different
 // interpolation methods that should yield the same numerical result.
 func TestCubic4vs6(t *testing.T) {
-	cases := []struct{
-		Name string
+	cases := []struct {
+		Name                     string
 		X1, Y1, DY1, X2, Y2, DY2 float64
 	}{
 		{"Line", 0, 1, 1, 1, 2, 1},
@@ -39,8 +39,8 @@ func TestCubic4vs6(t *testing.T) {
 }
 
 func TestMonoticity(t *testing.T) {
-	cases := []struct{
-		Name string
+	cases := []struct {
+		Name   string
 		Xs, Ys []float64
 	}{
 		{
@@ -69,7 +69,7 @@ func TestMonoticity(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			ms := FritschCarlsonTangents(tc.Xs, tc.Ys)
 			n := len(ms)
-			for i:= 0; i < n-1; i++ {
+			for i := 0; i < n-1; i++ {
 				minx := tc.Xs[i]
 				maxx := tc.Xs[i+1]
 				f := cubic4(minx, tc.Ys[i], ms[i], maxx, tc.Ys[i+1], ms[i+1])
@@ -78,7 +78,7 @@ func TestMonoticity(t *testing.T) {
 				for x := minx + dx; x < maxx; x += dx {
 					y := f(x)
 					if y < oy {
-						t.Errorf("Not monotonic: f(%f) = %f > f(%f) = %f", x - dx, oy, x, y)
+						t.Errorf("Not monotonic: f(%f) = %f > f(%f) = %f", x-dx, oy, x, y)
 						break
 					}
 					oy = y

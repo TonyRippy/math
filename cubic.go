@@ -12,19 +12,18 @@ import (
   all computation at runtime and captures all 6 input values.
   Useful for testing purposes.
 */
-func cubic6(x1, y1, dy1, x2, y2, dy2 float64) func (float64) float64 {
+func cubic6(x1, y1, dy1, x2, y2, dy2 float64) func(float64) float64 {
 	// For implementation details, see:
-  // https://en.wikipedia.org/wiki/Cubic_Hermite_spline
+	// https://en.wikipedia.org/wiki/Cubic_Hermite_spline
 	return func(x float64) float64 {
 		dx := x2 - x1
 		t := (x - x1) / dx
 		tt := t * t
 		ttt := tt * t
-		return (
-			(2*ttt - 3*tt + 1) * y1 +
-			(ttt - 2*tt + t) * dy1 * dx +
-			(-2*ttt + 3*tt) * y2 +
-			(ttt - tt) * dy2 * dx)
+		return ((2*ttt-3*tt+1)*y1 +
+			(ttt-2*tt+t)*dy1*dx +
+			(-2*ttt+3*tt)*y2 +
+			(ttt-tt)*dy2*dx)
 	}
 }
 
@@ -58,8 +57,8 @@ func SolveCubic(x1, y1, dy1, x2, y2, dy2 float64) (A, B, C, D float64) {
 
 	f := b1 / b2
 
-	A = (e1 - f * e2) / (a1 - f * a2)
-	B = (e1 - A * a1) / b1
+	A = (e1 - f*e2) / (a1 - f*a2)
+	B = (e1 - A*a1) / b1
 	C = dy1 - (3 * A * xx1) - (2 * B * x1)
 	D = y1 - (A * xx1 * x1) - (B * xx1) - (C * x1)
 	return
@@ -71,12 +70,12 @@ func SolveCubic(x1, y1, dy1, x2, y2, dy2 float64) (A, B, C, D float64) {
   but minimizes runtime computation.
   Only requires the capture of 4 float64 values.
 */
-func cubic4(x1, y1, dy1, x2, y2, dy2 float64) func (float64) float64 {
+func cubic4(x1, y1, dy1, x2, y2, dy2 float64) func(float64) float64 {
 	A, B, C, D := SolveCubic(x1, y1, dy1, x2, y2, dy2)
 	return func(x float64) float64 {
 		xx := x * x
-		return A * xx * x + B * xx + C * x + D
-  }
+		return A*xx*x + B*xx + C*x + D
+	}
 }
 
 /*
@@ -86,7 +85,7 @@ func cubic4(x1, y1, dy1, x2, y2, dy2 float64) func (float64) float64 {
   a function f(x) that allows one to interpolate values between the two
   given points.
 */
-func CubicFunction(x1, y1, dy1, x2, y2, dy2 float64) func (float64) float64 {
+func CubicFunction(x1, y1, dy1, x2, y2, dy2 float64) func(float64) float64 {
 	return cubic4(x1, y1, dy1, x2, y2, dy2)
 }
 
