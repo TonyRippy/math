@@ -5,10 +5,11 @@ import (
 	"testing"
 )
 
+const (
+	EPS = 1e-10
+)
+
 func TestRombergWithMidPoint(t *testing.T) {
-	const (
-		EPS = 1e-10
-	)
 	// \int(1) = x
 	f := func(x float64) float64 {
 		return 1
@@ -52,11 +53,23 @@ func TestRombergWithMidPoint(t *testing.T) {
 	}
 }
 
-func TestRungeKutta(t *testing.T) {
-	const (
-		EPS = 1e-10
-	)
+func TestRombergWithSqrtLower(t *testing.T) {
+	// \int(1/x) = ln(x)
+	f := func(x float64) float64 {
+		return 1 / x
+	}
+	actual, err := Romberg(MidPointSqrtLower(f, 0.01, 4), EPS)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	expected := math.Log(4) - math.Log(0.01)
+	if math.Abs(actual-expected) > EPS {
+		t.Errorf("Romberg: Expected %f, got %f.", expected, actual)
+	}
+}
 
+func TestRungeKutta(t *testing.T) {
 	// y[0]: f(x)  = x
 	// y[1]: f'(x) = 1
 	//       f"(x) = 0

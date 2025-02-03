@@ -72,12 +72,41 @@ func MidPointInf(f func(float64) float64, a float64, b float64) RombergStepper {
 }
 
 /*
+This routine is an exact replacement for MidPoint, except that it allows for
+an inverse square-root singularity in the integrand at the lower limit `a`.
+ */
+func MidPointSqrtLower(f func(float64) float64, a float64, b float64) RombergStepper {
+	// Change the limits of integration.
+	ff := func(x float64) float64 {
+		return 2.0 * x * f(a+x*x)
+	}
+	bb := math.Sqrt(b - a)
+	aa := 0.0
+	return MidPoint(ff, aa, bb)
+}
+
+/*
+This routine is an exact replacement for MidPoint, except that it allows for
+an inverse square-root singularity in the integrand at the upper limit `b`.
+ */
+ func MidPointSqrtUpper(f func(float64) float64, a float64, b float64) RombergStepper {
+	// Change the limits of integration.
+	ff := func(x float64) float64 {
+		return 2.0 * x * f(b-x*x)
+	}
+	bb := math.Sqrt(b - a)
+	aa := 0.0
+	return MidPoint(ff, aa, bb)
+}
+
+/*
 Romberg integration on an open interval, with desired accuracy eps.
 Normally stepper will be an open formula, not evaluating its function at the
 endpoints. It is assumed that stepper triples the number of steps on each call,
-and that its error series contains only even powers of the number of steps.  The
-routines MidPoint and MidPointInf are possible choices.
-(Also midsql, midsqu and midexp, which are not implemented here.)
+and that its error series contains only even powers of the number of steps.
+
+The routines MidPoint, MidPointInf, MidPointSqrt are possible choices.
+(Also midexp, which is not implemented here.)
 */
 func Romberg(stepper RombergStepper, eps float64) (ss float64, err error) {
 	const (
