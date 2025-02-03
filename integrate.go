@@ -30,26 +30,26 @@ interior points.
 func MidPoint(f func(float64) float64, a float64, b float64) RombergStepper {
 	return func(n int, s float64) float64 {
 		if n == 1 {
-			return (b-a) * f(0.5*(a+b))
+			return (b - a) * f(0.5*(a+b))
 		}
 		it := 1
-		for j:=1; j<n-1; j++ {
+		for j := 1; j < n-1; j++ {
 			it *= 3
 		}
 		tnm := float64(it)
-		del := (b-a)/(3.0*tnm)
-		ddel := del+del
-		// The added points alternate in spacing between del and ddel. 
-		x := a+0.5*del
+		del := (b - a) / (3.0 * tnm)
+		ddel := del + del
+		// The added points alternate in spacing between del and ddel.
+		x := a + 0.5*del
 		sum := 0.0
-		for j:=1; j <=it; j++ {
+		for j := 1; j <= it; j++ {
 			sum += f(x)
 			x += ddel
 			sum += f(x)
 			x += del
 		}
 		// The new sum is combined with the old integral to give a refined integral.
-		return (s+(b-a)*sum/tnm)/3.0
+		return (s + (b-a)*sum/tnm) / 3.0
 	}
 }
 
@@ -64,14 +64,14 @@ negative, but not both. a and b must have the same sign.
 func MidPointInf(f func(float64) float64, a float64, b float64) RombergStepper {
 	// Change the limits of integration.
 	ff := func(x float64) float64 {
-		return f(1.0/x) / (x*x)
+		return f(1.0/x) / (x * x)
 	}
-	aa := 1.0/b
-	bb := 1.0/a
+	aa := 1.0 / b
+	bb := 1.0 / a
 	return MidPoint(ff, aa, bb)
 }
 
-/* 
+/*
 Romberg integration on an open interval, with desired accuracy eps.
 Normally stepper will be an open formula, not evaluating its function at the
 endpoints. It is assumed that stepper triples the number of steps on each call,
@@ -81,18 +81,18 @@ routines MidPoint and MidPointInf are possible choices.
 */
 func Romberg(stepper RombergStepper, eps float64) (ss float64, err error) {
 	const (
-		JMAX=14
-		JMAXP=JMAX+1
-		K=5
+		JMAX  = 14
+		JMAXP = JMAX + 1
+		K     = 5
 	)
 	ss = 0.0
 	h := make([]float64, JMAXP+1)
 	h[1] = 1.0
 	s := make([]float64, JMAXP)
-	for j:=1; j<=JMAX; j++ {
+	for j := 1; j <= JMAX; j++ {
 		s[j] = stepper(j, s[j-1])
 		if j >= K {
-			i := j-K+1
+			i := j - K + 1
 			var dss float64
 			ss, dss, err = polint(h[i:], s[i:], K, 0.0)
 			if err != nil {
@@ -103,7 +103,7 @@ func Romberg(stepper RombergStepper, eps float64) (ss float64, err error) {
 			}
 		}
 		// This is where the assumption of step tripling and even error series is used.
-		h[j+1] = h[j]/9.0
+		h[j+1] = h[j] / 9.0
 	}
 	return ss, errors.New("Too many steps in Romberg")
 }
@@ -112,7 +112,7 @@ func Romberg(stepper RombergStepper, eps float64) (ss float64, err error) {
 A user-supplied function that evaluates dydx at x, given the dependent variables y[].
 */
 type OdeFunc func(x float64, y []float64, dydx []float64)
-	
+
 /*
 Given values for n variables y[] and their derivatives dydx[] known at x, use
 the fifth-order Cash-Karp Runge-Kutta method to advance the solution over an
@@ -121,37 +121,37 @@ estimate of the local truncation error in yerr[] using the embedded fourth-order
 method. The user supplies the routine derivs(x, y, dxdy), which returns
 derivatives dydx at x.
 */
-func rkck(y []float64, dydx []float64, n int,	x float64, h float64, yout []float64, yerr []float64, derivs OdeFunc) {
+func rkck(y []float64, dydx []float64, n int, x float64, h float64, yout []float64, yerr []float64, derivs OdeFunc) {
 	const (
-		a2=0.2
-		a3=0.3
-		a4=0.6
-		a5=1.0
-		a6=0.875
-		b21=0.2
-		b31=3.0/40.0
-		b32=9.0/40.0
-		b41=0.3
-		b42=-0.9
-		b43=1.2
-		b51=-11.0/54.0
-		b52=2.5
-		b53=-70.0/27.0
-		b54=35.0/27.0
-		b61=1631.0/55296.0
-		b62=175.0/512.0
-		b63=575.0/13824.0
-		b64=44275.0/110592.0
-		b65=253.0/4096.0
-		c1=37.0/378.0
-		c3=250.0/621.0
-		c4=125.0/594.0
-		c6=512.0/1771.0
-		dc1=c1-2825.0/27648.0
-		dc3=c3-18575.0/48384.0
-		dc4=c4-13525.0/55296.0
-		dc5=-277.0/14336.0
-		dc6=c6-0.25
+		a2  = 0.2
+		a3  = 0.3
+		a4  = 0.6
+		a5  = 1.0
+		a6  = 0.875
+		b21 = 0.2
+		b31 = 3.0 / 40.0
+		b32 = 9.0 / 40.0
+		b41 = 0.3
+		b42 = -0.9
+		b43 = 1.2
+		b51 = -11.0 / 54.0
+		b52 = 2.5
+		b53 = -70.0 / 27.0
+		b54 = 35.0 / 27.0
+		b61 = 1631.0 / 55296.0
+		b62 = 175.0 / 512.0
+		b63 = 575.0 / 13824.0
+		b64 = 44275.0 / 110592.0
+		b65 = 253.0 / 4096.0
+		c1  = 37.0 / 378.0
+		c3  = 250.0 / 621.0
+		c4  = 125.0 / 594.0
+		c6  = 512.0 / 1771.0
+		dc1 = c1 - 2825.0/27648.0
+		dc3 = c3 - 18575.0/48384.0
+		dc4 = c4 - 13525.0/55296.0
+		dc5 = -277.0 / 14336.0
+		dc6 = c6 - 0.25
 	)
 	ak2 := make([]float64, n)
 	ak3 := make([]float64, n)
@@ -160,36 +160,36 @@ func rkck(y []float64, dydx []float64, n int,	x float64, h float64, yout []float
 	ak6 := make([]float64, n)
 	ytemp := make([]float64, n)
 	// First step.
-	for i:=0; i<n; i++ {
-		ytemp[i] = y[i]+h*(b21*dydx[i]);
+	for i := 0; i < n; i++ {
+		ytemp[i] = y[i] + h*(b21*dydx[i])
 	}
 	// Second step.
-	derivs(x+a2*h,ytemp,ak2)
-	for i:=0; i<n; i++ {
-		ytemp[i] = y[i]+h*(b31*dydx[i]+b32*ak2[i])
+	derivs(x+a2*h, ytemp, ak2)
+	for i := 0; i < n; i++ {
+		ytemp[i] = y[i] + h*(b31*dydx[i]+b32*ak2[i])
 	}
 	// Third step.
-	derivs(x+a3*h,ytemp,ak3)
-	for i:=0; i<n; i++ {
-		ytemp[i] = y[i]+h*(b41*dydx[i]+b42*ak2[i]+b43*ak3[i])
+	derivs(x+a3*h, ytemp, ak3)
+	for i := 0; i < n; i++ {
+		ytemp[i] = y[i] + h*(b41*dydx[i]+b42*ak2[i]+b43*ak3[i])
 	}
 	// Fourth step.
-	derivs(x+a4*h,ytemp,ak4)
-	for i:=0; i<n; i++ {
-		ytemp[i] = y[i]+h*(b51*dydx[i]+b52*ak2[i]+b53*ak3[i]+b54*ak4[i])
+	derivs(x+a4*h, ytemp, ak4)
+	for i := 0; i < n; i++ {
+		ytemp[i] = y[i] + h*(b51*dydx[i]+b52*ak2[i]+b53*ak3[i]+b54*ak4[i])
 	}
 	// Fifth step.
-	derivs(x+a5*h,ytemp,ak5)
-	for i:=0; i<n; i++ {
-		ytemp[i] = y[i]+h*(b61*dydx[i]+b62*ak2[i]+b63*ak3[i]+b64*ak4[i]+b65*ak5[i])
+	derivs(x+a5*h, ytemp, ak5)
+	for i := 0; i < n; i++ {
+		ytemp[i] = y[i] + h*(b61*dydx[i]+b62*ak2[i]+b63*ak3[i]+b64*ak4[i]+b65*ak5[i])
 	}
 	// Sixth step.
-	derivs(x+a6*h,ytemp,ak6)
-	for i:=0; i<n; i++ {
+	derivs(x+a6*h, ytemp, ak6)
+	for i := 0; i < n; i++ {
 		// Accumulate increments with proper weights.
-		yout[i] = y[i]+h*(c1*dydx[i]+c3*ak3[i]+c4*ak4[i]+c6*ak6[i])
+		yout[i] = y[i] + h*(c1*dydx[i]+c3*ak3[i]+c4*ak4[i]+c6*ak6[i])
 		// Estimate error as difference between fourth and fifth order methods.
-		yerr[i] = h*(dc1*dydx[i]+dc3*ak3[i]+dc4*ak4[i]+dc5*ak5[i]+dc6*ak6[i])
+		yerr[i] = h * (dc1*dydx[i] + dc3*ak3[i] + dc4*ak4[i] + dc5*ak5[i] + dc6*ak6[i])
 	}
 }
 
@@ -204,31 +204,31 @@ input are the step size to be attempted h, the required accuracy eps, and the
 vector yscal[] against which the error is scaled.  On output, the y vector is
 replaced by their new values, and the function returns new values for x and h
 respectively.
-*/  
+*/
 func rkqs(y []float64, dydx []float64, n int, x float64, h float64, eps float64, yscal []float64, derivs OdeFunc) (float64, float64, error) {
 	const (
-		SAFETY=0.9
-		PGROW=-0.2
-		PSHRINK=-0.25
-		ERRCON=1.89e-4  // ~= math.Pow(5/SAFETY, 1/PGROW)
+		SAFETY  = 0.9
+		PGROW   = -0.2
+		PSHRINK = -0.25
+		ERRCON  = 1.89e-4 // ~= math.Pow(5/SAFETY, 1/PGROW)
 	)
 	var errmax float64
 	ytemp := make([]float64, n)
 	yerr := make([]float64, n)
 	for {
 		// Take a step.
-		rkck(y, dydx, n, x, h, ytemp, yerr, derivs)  
+		rkck(y, dydx, n, x, h, ytemp, yerr, derivs)
 		// Evaluate accuracy.
 		errmax = 0.0
-		for i:=0; i<n; i++ {  
+		for i := 0; i < n; i++ {
 			errmax = math.Max(errmax, math.Abs(yerr[i]/yscal[i]))
 		}
-		errmax /= eps  // Scale relative to required tolerance. 
+		errmax /= eps // Scale relative to required tolerance.
 		if errmax <= 1.0 {
-			break  // Step succeeded. 
+			break // Step succeeded.
 		}
 		// Truncation error too large, reduce step size.
-		htemp := SAFETY * h * math.Pow(errmax,PSHRINK)
+		htemp := SAFETY * h * math.Pow(errmax, PSHRINK)
 		if h >= 0.0 {
 			h = math.Max(htemp, 0.1*h)
 		} else {
@@ -240,7 +240,7 @@ func rkqs(y []float64, dydx []float64, n int, x float64, h float64, eps float64,
 			return xnew, h, errors.New("step size underflow in rkqs")
 		}
 	}
-	
+
 	// Compute size of next step.
 	var hnext float64
 	if errmax > ERRCON {
@@ -250,7 +250,7 @@ func rkqs(y []float64, dydx []float64, n int, x float64, h float64, eps float64,
 		hnext = 5.0 * h
 	}
 	xnext := x + h
-	for i:= 0; i < n; i++ {
+	for i := 0; i < n; i++ {
 		y[i] = ytemp[i]
 	}
 	return xnext, hnext, nil
@@ -267,20 +267,20 @@ stepper routine to be used.
 */
 func odeint(ystart []float64, nvar int, x1 float64, x2 float64, eps float64, h1 float64, hmin float64, derivs OdeFunc, stepper rungeKuttaStepper) error {
 	const (
-		MAXSTP int = 10000  // TODO: Make this a flag? 
-		TINY float64 = 1.0e-30
+		MAXSTP int     = 10000 // TODO: Make this a flag?
+		TINY   float64 = 1.0e-30
 	)
 	yscal := make([]float64, nvar)
 	y := make([]float64, nvar)
 	dydx := make([]float64, nvar)
 	x := x1
 	h := math.Copysign(h1, x2-x1)
-	for i:=0; i<nvar; i++ {
+	for i := 0; i < nvar; i++ {
 		y[i] = ystart[i]
 	}
-	for nstp:=0; nstp < MAXSTP; nstp++ {  // Take at most MAXSTP steps.
+	for nstp := 0; nstp < MAXSTP; nstp++ { // Take at most MAXSTP steps.
 		derivs(x, y, dydx)
-		for i:=0; i<nvar; i++ {
+		for i := 0; i < nvar; i++ {
 			// Scaling used to monitor accuracy. This general-purpose choice can be
 			// modified if need be.
 			yscal[i] = math.Abs(y[i]) + math.Abs(dydx[i]*h) + TINY
@@ -294,11 +294,11 @@ func odeint(ystart []float64, nvar int, x1 float64, x2 float64, eps float64, h1 
 		if err != nil {
 			return err
 		}
-		if (x-x2)*(x2-x1) >= 0.0 {  // Are we done?
-			for i:=0; i<nvar; i++ {
+		if (x-x2)*(x2-x1) >= 0.0 { // Are we done?
+			for i := 0; i < nvar; i++ {
 				ystart[i] = y[i]
 			}
-			return nil  // Normal exit.
+			return nil // Normal exit.
 		}
 		if math.Abs(h) <= hmin {
 			return errors.New("step size too small in odeint")

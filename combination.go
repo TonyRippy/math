@@ -32,8 +32,8 @@ func Combinations(n uint, k uint) uint {
 		}
 	}
 	var lo uint = 2
-	for ; (lo <= j) && (result % lo == 0); lo++ {
-			result /= lo
+	for ; (lo <= j) && (result%lo == 0); lo++ {
+		result /= lo
 	}
 	for ; hi > k; hi-- {
 		result *= hi
@@ -61,7 +61,7 @@ for enumerating potentially large numbers of combinations.
 func WalkCombinations(n int, k int, f func([]bool)) error {
 	if n < 0 {
 		return fmt.Errorf("Cannot choose from a negative number of items. (%d)", n)
-	}	
+	}
 	if k > n {
 		return fmt.Errorf("Cannot choose %d out of %d", k, n)
 	}
@@ -78,13 +78,13 @@ func WalkCombinations(n int, k int, f func([]bool)) error {
 	// [0 1 2 3 4 5], k=2, n=6 --> [f, f, f, f, t, t]
 	// [0 1 2 3 4], k=3, n=5 : --> [f, f, t, t, t]
 	x := n - k
-	for i, _ := range(perm) {
+	for i, _ := range perm {
 		perm[i] = (i >= x)
 	}
 	pop := false
 	remain := 0
 	i := n
-	for ; i >= 0; {
+	for i >= 0 {
 		if i == n {
 			// Permutation fully specified. Call the function:
 			f(perm)
@@ -97,15 +97,15 @@ func WalkCombinations(n int, k int, f func([]bool)) error {
 			// The element we're considering has already been true,
 			// so we need to pop the stack.
 			pop = true
-			perm[i] = false  // unpick the value
-			remain += 1  // one more to pick
-			i -= 1  // move back to previous item
+			perm[i] = false // unpick the value
+			remain += 1     // one more to pick
+			i -= 1          // move back to previous item
 			continue
 		}
 		// If you get here, perm[i] == false.
 		if !pop {
 			// We haven't tried "false" yet. Can we?
-			if n - i > remain {
+			if n-i > remain {
 				// We can still say "false", because there are enough elements
 				// left to pick the right number of "true"s.
 				// Leave this element false and move forward.

@@ -1011,7 +1011,7 @@ var (
 )
 
 func TestSieve(t *testing.T) {
-	for j := 0; j < 2; j++ {  // one Sieve run should not affect others...
+	for j := 0; j < 2; j++ { // one Sieve run should not affect others...
 		s := NewSieve()
 		for i := 0; i < 1000; i++ {
 			want := FirstThousandPrimes[i]
@@ -1029,13 +1029,12 @@ func benchmarkSieveN(b *testing.B, n int) {
 	var p uint64
 	for i := 0; i < b.N; i++ {
 		s := NewSieve()
-		for j:=0; j < n; j++ {
+		for j := 0; j < n; j++ {
 			p = s.Next()
 		}
 	}
 	result = p
 }
-
 
 func BenchmarkSieve1k(b *testing.B) {
 	benchmarkSieveN(b, 1e3)

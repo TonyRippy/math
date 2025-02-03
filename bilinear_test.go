@@ -10,13 +10,12 @@ func mostlyEqual(expected, actual float64) bool {
 	return math.Abs(expected-actual) < epsilon
 }
 
-func testF(f func (float64, float64) float64, x float64, y float64, expected float64, t *testing.T) {
-	actual := f(x,y)
+func testF(f func(float64, float64) float64, x float64, y float64, expected float64, t *testing.T) {
+	actual := f(x, y)
 	if !mostlyEqual(expected, actual) {
 		t.Errorf("f(%f, %f) = %f, expected %f", x, y, actual, expected)
 	}
 }
-
 
 func TestBilinear8(t *testing.T) {
 	f := bilinear8(0, 1, 0, 1, 0, 1, 1, 1)

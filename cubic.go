@@ -7,10 +7,10 @@ import (
 )
 
 /*
-  Returns a closure that performs cubic interpolation.
-  This returns a somewhat inefficient variant that peforms
-  all computation at runtime and captures all 6 input values.
-  Useful for testing purposes.
+Returns a closure that performs cubic interpolation.
+This returns a somewhat inefficient variant that peforms
+all computation at runtime and captures all 6 input values.
+Useful for testing purposes.
 */
 func cubic6(x1, y1, dy1, x2, y2, dy2 float64) func(float64) float64 {
 	// For implementation details, see:
@@ -28,11 +28,12 @@ func cubic6(x1, y1, dy1, x2, y2, dy2 float64) func(float64) float64 {
 }
 
 /*
-  A cubic spline can be expressed as a third-degree polynomial function:
-    f(x) = Ax^3 + Bx^2 + Cx + D
+A cubic spline can be expressed as a third-degree polynomial function:
 
-  This function, given the values of x, f(x) and f'(x) at two end points,
-  will calcuate and return the values for A, B, C, D.
+	f(x) = Ax^3 + Bx^2 + Cx + D
+
+This function, given the values of x, f(x) and f'(x) at two end points,
+will calcuate and return the values for A, B, C, D.
 */
 func SolveCubic(x1, y1, dy1, x2, y2, dy2 float64) (A, B, C, D float64) {
 	// Yeah, sorry about this mess... I will try and post a derivation for this.
@@ -65,10 +66,10 @@ func SolveCubic(x1, y1, dy1, x2, y2, dy2 float64) (A, B, C, D float64) {
 }
 
 /*
-  Returns a closure that performs cubic interpolation.
-  This returns a more efficient closure that is expensive to create,
-  but minimizes runtime computation.
-  Only requires the capture of 4 float64 values.
+Returns a closure that performs cubic interpolation.
+This returns a more efficient closure that is expensive to create,
+but minimizes runtime computation.
+Only requires the capture of 4 float64 values.
 */
 func cubic4(x1, y1, dy1, x2, y2, dy2 float64) func(float64) float64 {
 	A, B, C, D := SolveCubic(x1, y1, dy1, x2, y2, dy2)
@@ -78,11 +79,11 @@ func cubic4(x1, y1, dy1, x2, y2, dy2 float64) func(float64) float64 {
 }
 
 /*
-  CubicFunction returns a function that performs cubic interpolation.
+CubicFunction returns a function that performs cubic interpolation.
 
-  Given the values of x, f(x) and f'(x) at two end points, this will return
-  a function f(x) that allows one to interpolate values between the two
-  given points.
+Given the values of x, f(x) and f'(x) at two end points, this will return
+a function f(x) that allows one to interpolate values between the two
+given points.
 */
 func CubicFunction(x1, y1, dy1, x2, y2, dy2 float64) func(float64) float64 {
 	return cubic4(x1, y1, dy1, x2, y2, dy2)
@@ -93,9 +94,10 @@ FritschCarlsonTangents calculates tangents for a set of points
 that ensure monotonicity for a resulting Hermite spline.
 
 This function makes some important assumptions:
-  1. That the input arrays have the same length.
-  2. That the data points are monotonic.
-  3. That the input points are sorted on the x axis, ascending.
+ 1. That the input arrays have the same length.
+ 2. That the data points are monotonic.
+ 3. That the input points are sorted on the x axis, ascending.
+
 These assumptions are not verified by the method.
 */
 func FritschCarlsonTangents(xs, ys []float64) []float64 {

@@ -25,7 +25,7 @@ func polint(xa []float64, ya []float64, n int, x float64) (y float64, dy float64
 	// Here we find the index ns of the closest table entry,
 	var ns int
 	dif := math.MaxFloat64
-	for i:=0; i<n; i++ {
+	for i := 0; i < n; i++ {
 		dift := math.Abs(x - xa[i])
 		if dift < dif {
 			ns = i
@@ -35,21 +35,21 @@ func polint(xa []float64, ya []float64, n int, x float64) (y float64, dy float64
 		c[i] = ya[i]
 		d[i] = ya[i]
 	}
-	y = ya[ns]  // This is the initial approximation to y.
+	y = ya[ns] // This is the initial approximation to y.
 	ns -= 1
-	for m:=1; m<n; m++ {  // For each column of the tableau,
-		for i:=0; i<n-m; i++ {  // we loop over the current c's and d's and update them.
-			ho := xa[i]-x
-			hp := xa[i+m]-x
-			w := c[i+1]-d[i]
-			den := ho-hp
+	for m := 1; m < n; m++ { // For each column of the tableau,
+		for i := 0; i < n-m; i++ { // we loop over the current c's and d's and update them.
+			ho := xa[i] - x
+			hp := xa[i+m] - x
+			w := c[i+1] - d[i]
+			den := ho - hp
 			if den == 0.0 {
 				err = errors.New("Error in routine polint")
 				return
 			}
-			den = w/den
-			d[i] = hp*den  // Here the c's and d's are updated.
-			c[i] = ho*den
+			den = w / den
+			d[i] = hp * den // Here the c's and d's are updated.
+			c[i] = ho * den
 		}
 		if 2*ns < n-m {
 			dy = c[ns+1]

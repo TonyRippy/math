@@ -16,7 +16,7 @@ func TestCombinations(t *testing.T) {
 		[]uint{40, 10, 847660528},
 		[]uint{90, 10, 5720645481903},
 	}
-	for _, c := range(cases) {
+	for _, c := range cases {
 		expected := c[2]
 		actual := Combinations(c[0], c[1])
 		if actual != expected {
@@ -31,7 +31,7 @@ converting it to an integer value.
 */
 func permToInt(perm []bool) int {
 	val := 0
-	for i, v := range(perm) {
+	for i, v := range perm {
 		if v {
 			bit := 1 << uint(i)
 			val = val | bit
@@ -51,7 +51,7 @@ func TestPermToInt(t *testing.T) {
 		[]bool{false, true, true},
 		[]bool{true, true, true},
 	}
-	for expected, perm := range(cases) {
+	for expected, perm := range cases {
 		actual := permToInt(perm)
 		if actual != expected {
 			t.Errorf("PermToInt incorrect. Expected %d, got %d", expected, actual)
@@ -77,7 +77,7 @@ func TestChooseZero(t *testing.T) {
 		if len(perm) != 100 {
 			t.Errorf("Expected len(perm) == 100, got %d", len(perm))
 		}
-		for _, v := range(perm) {
+		for _, v := range perm {
 			if v {
 				t.Errorf("Expected all items in permutation to be false! %v", perm)
 			}
@@ -85,7 +85,7 @@ func TestChooseZero(t *testing.T) {
 	})
 	if calls != 1 {
 		t.Errorf("WalkCombinations(100, 0): expected 1 callback, got %d", calls)
-	}	
+	}
 }
 
 func TestChooseOne(t *testing.T) {
@@ -94,27 +94,27 @@ func TestChooseOne(t *testing.T) {
 		calls = append(calls, permToInt(perm))
 	})
 	expected := []int{
-		1<<0,  // one bit at a time
-		1<<1,
-		1<<2,
-		1<<3,
-		1<<4,
-		1<<5,
-		1<<6,
-		1<<7,
-		1<<8,
-		1<<9,
+		1 << 0, // one bit at a time
+		1 << 1,
+		1 << 2,
+		1 << 3,
+		1 << 4,
+		1 << 5,
+		1 << 6,
+		1 << 7,
+		1 << 8,
+		1 << 9,
 	}
 	if len(calls) != len(expected) {
 		t.Errorf("WalkCombinations(10, 1): expected %v, got %v.", expected, calls)
-	}	else {	
+	} else {
 		sort.Sort(sort.IntSlice(calls))
-		for i, v := range(calls) {
+		for i, v := range calls {
 			if v != expected[i] {
 				t.Errorf("WalkCombinations(10, 1), call %d: expected %v, got %v.", i, expected[i], v)
 			}
 		}
-	}	
+	}
 }
 
 func TestChooseAll(t *testing.T) {
@@ -123,17 +123,17 @@ func TestChooseAll(t *testing.T) {
 		calls = append(calls, permToInt(perm))
 	})
 	expected := []int{
-		1<<10 - 1,  // all should be true
+		1<<10 - 1, // all should be true
 	}
 	if len(calls) != len(expected) {
 		t.Errorf("Expected %v, got %v.", expected, calls)
-	}	else {	
-		for i, v := range(calls) {
+	} else {
+		for i, v := range calls {
 			if v != expected[i] {
 				t.Errorf("WalkCombinations(10, 10), call %d: expected %v, got %v.", i, expected[i], v)
 			}
 		}
-	}	
+	}
 }
 
 func TestChooseSome(t *testing.T) {

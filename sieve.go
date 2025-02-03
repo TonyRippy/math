@@ -261,7 +261,7 @@ var (
 		/* Prime[255] = */ 1619,
 	}
 
-	firstMarks = []uint64{  
+	firstMarks = []uint64{
 		/* Prime[0] = 2, FirstMark = */ 1620,
 		/* Prime[1] = 3, FirstMark = */ 1620,
 		/* Prime[2] = 5, FirstMark = */ 1620,
@@ -529,9 +529,9 @@ type Sieve interface {
 }
 
 type sieve struct {
-	n uint64
+	n      uint64
 	primes []uint64
-	marks []uint64
+	marks  []uint64
 }
 
 // NewSieve creates a new sieve that starts generating primes at 2.
@@ -542,7 +542,7 @@ func NewSieve() Sieve {
 func (s *sieve) Next() uint64 {
 	if s.primes == nil {
 		p := FirstPrimes[s.n]
-		s.n += 1		
+		s.n += 1
 		if s.n == 256 {
 			// We know we can skip even numbers, so we increment n by 2
 			// and leave out the first prime & mark entries.
@@ -556,7 +556,7 @@ func (s *sieve) Next() uint64 {
 	// that passes all the incremental filters.
 	n := s.n
 	for i := 0; i < len(s.primes); {
-		for ; s.marks[i] < n;  {
+		for s.marks[i] < n {
 			s.marks[i] += s.primes[i]
 		}
 		if s.marks[i] == n {
@@ -571,6 +571,6 @@ func (s *sieve) Next() uint64 {
 	// n is prime! Add it to the lists before returning.
 	s.n = n + 2
 	s.primes = append(s.primes, n)
-	s.marks = append(s.marks, n * n)
+	s.marks = append(s.marks, n*n)
 	return n
 }
